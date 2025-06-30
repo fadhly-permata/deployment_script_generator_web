@@ -1,8 +1,8 @@
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 using ScriptDeployerWeb.Utilities.DI;
 using ScriptDeployerWeb.Utilities.Middlewares.Swagger;
 using ScriptDeployerWeb.Utilities.Models;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 internal partial class Program

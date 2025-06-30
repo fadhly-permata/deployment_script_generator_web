@@ -1,8 +1,8 @@
 using System.Net;
 using IDC.Utilities;
 using IDC.Utilities.Models.API;
-using ScriptDeployerWeb.Utilities.DI;
 using Newtonsoft.Json.Linq;
+using ScriptDeployerWeb.Utilities.DI;
 
 namespace ScriptDeployerWeb.Utilities.Middlewares;
 

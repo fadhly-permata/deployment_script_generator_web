@@ -1,5 +1,5 @@
-using ScriptDeployerWeb.Utilities.DI;
 using IDC.Utilities;
+using ScriptDeployerWeb.Utilities.DI;
 
 /// <summary>
 /// Core program class containing dependency injection configurations

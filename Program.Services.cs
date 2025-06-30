@@ -1,8 +1,8 @@
 using IDC.Utilities.Models.API;
-using ScriptDeployerWeb.Utilities.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ScriptDeployerWeb.Utilities.Middlewares;
 
 internal partial class Program
 {

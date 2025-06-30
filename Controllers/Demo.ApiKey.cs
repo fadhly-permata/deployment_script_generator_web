@@ -1,8 +1,8 @@
 using IDC.Utilities;
 using IDC.Utilities.Models.API;
+using Microsoft.AspNetCore.Mvc;
 using ScriptDeployerWeb.Utilities;
 using ScriptDeployerWeb.Utilities.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ScriptDeployerWeb.Controllers;
 

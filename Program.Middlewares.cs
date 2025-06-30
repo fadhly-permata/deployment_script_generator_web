@@ -1,5 +1,5 @@
-using ScriptDeployerWeb.Utilities.Middlewares;
 using Microsoft.Extensions.FileProviders;
+using ScriptDeployerWeb.Utilities.Middlewares;
 
 internal partial class Program
 {
