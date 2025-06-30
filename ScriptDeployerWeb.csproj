@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest">
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+    <PackageReference Include="MongoDB.Driver" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="IDC.Utilities">
+      <HintPath>idc-shr-dependency\IDC.Utilities.dll</HintPath>
+    </Reference>
+    <!-- 
+    <Reference Include="IDC.UDMongo">
+      <HintPath>idc-shr-dependency\IDC.UDMongo.dll</HintPath>
+    </Reference>
+    <Reference Include="IDC.decision_cb">
+      <HintPath>D:\- Works\SCM\idc-shr-dependency\wwwroot\dependencies\IDC.Decision_CB\idc.decision_cb.dll</HintPath>
+    </Reference>
+    -->
+  </ItemGroup>
+</Project>

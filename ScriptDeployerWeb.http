@@ -1,0 +1,6 @@
+@ScriptDeployerWeb_HostAddress = http://localhost:32064
+
+GET {{ScriptDeployerWeb_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
