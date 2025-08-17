@@ -3,7 +3,7 @@ using IDC.Utilities.Models.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Filter that validates the model state and returns appropriate error responses when validation fails.
@@ -101,14 +101,14 @@ public class ModelStateInvalidFilters(Language language) : IActionFilter
     {
         if (!context.ModelState.IsValid)
             context.Result = new BadRequestObjectResult(
-                new APIResponseData<List<string>?>()
-                    .ChangeStatus(language, "api.status.failed")
-                    .ChangeMessage(language, "api.message.request_validation_error")
+                error: new APIResponseData<List<string>?>()
+                    .ChangeStatus(language: language, key: "api.status.failed")
+                    .ChangeMessage(language: language, key: "api.message.request_validation_error")
                     .ChangeData(
                         [
                             .. context
-                                .ModelState.Values.SelectMany(e => e.Errors)
-                                .Select(e => language.GetMessage(path: e.ErrorMessage)),
+                                .ModelState.Values.SelectMany(selector: e => e.Errors)
+                                .Select(selector: e => language.GetMessage(path: e.ErrorMessage)),
                         ]
                     )
             );

@@ -1,7 +1,7 @@
 using IDC.Utilities;
 using IDC.Utilities.Models.API;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Implements IP-based rate limiting to protect API endpoints from excessive requests.
@@ -227,7 +227,7 @@ public class RateLimitingMiddleware(
         {
             context.Response.StatusCode = 429;
             await context.Response.WriteAsJsonAsync(
-                new APIResponse()
+                value: new APIResponse()
                     .ChangeStatus(language: _language, key: "api.status.failed")
                     .ChangeMessage(language: _language, key: "api.rate_limit_exceeded")
             );
@@ -235,6 +235,6 @@ public class RateLimitingMiddleware(
         }
 
         cache.Set(key: cacheKey, value: requestCount + 1, expirationMinutes: TimeWindowMinutes);
-        await next(context);
+        await next(context: context);
     }
 }

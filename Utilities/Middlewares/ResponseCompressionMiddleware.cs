@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Middleware for compressing HTTP responses based on the client's Accept-Encoding header.
@@ -131,9 +131,9 @@ public class ResponseCompressionMiddleware(RequestDelegate next)
     {
         var acceptEncoding = context.Request.Headers.AcceptEncoding.ToString().ToLower();
 
-        if (string.IsNullOrEmpty(acceptEncoding))
+        if (string.IsNullOrEmpty(value: acceptEncoding))
         {
-            await next(context);
+            await next(context: context);
             return;
         }
 
@@ -143,32 +143,32 @@ public class ResponseCompressionMiddleware(RequestDelegate next)
 
         try
         {
-            await next(context);
+            await next(context: context);
 
             if (
                 context.Response.StatusCode == StatusCodes.Status204NoContent
                 || context.Response.StatusCode == StatusCodes.Status304NotModified
             )
-            {
                 return;
-            }
 
-            var contentType = context.Response.ContentType?.ToLower() ?? string.Empty;
-            var shouldCompress = CompressibleTypes.Any(type => contentType.Contains(type));
-
-            if (!shouldCompress || memoryStream.Length == 0)
+            if (
+                !CompressibleTypes.Any(predicate: type =>
+                    (context.Response.ContentType?.ToLower() ?? string.Empty).Contains(value: type)
+                )
+                || memoryStream.Length == 0
+            )
             {
                 context.Response.Body = originalBody;
                 memoryStream.Position = 0;
-                await memoryStream.CopyToAsync(context.Response.Body);
+                await memoryStream.CopyToAsync(destination: context.Response.Body);
                 return;
             }
 
-            context.Response.Headers.Remove("Content-Length");
+            context.Response.Headers.Remove(key: "Content-Length");
             memoryStream.Position = 0;
             context.Response.Body = originalBody;
 
-            if (acceptEncoding.Contains("gzip"))
+            if (acceptEncoding.Contains(value: "gzip"))
             {
                 context.Response.Headers.ContentEncoding = "gzip";
                 await using var compressed = new GZipStream(
@@ -176,9 +176,9 @@ public class ResponseCompressionMiddleware(RequestDelegate next)
                     compressionLevel: CompressionLevel.Fastest,
                     leaveOpen: true
                 );
-                await memoryStream.CopyToAsync(compressed);
+                await memoryStream.CopyToAsync(destination: compressed);
             }
-            else if (acceptEncoding.Contains("deflate"))
+            else if (acceptEncoding.Contains(value: "deflate"))
             {
                 context.Response.Headers.ContentEncoding = "deflate";
                 await using var compressed = new DeflateStream(
@@ -186,11 +186,11 @@ public class ResponseCompressionMiddleware(RequestDelegate next)
                     compressionLevel: CompressionLevel.Fastest,
                     leaveOpen: true
                 );
-                await memoryStream.CopyToAsync(compressed);
+                await memoryStream.CopyToAsync(destination: compressed);
             }
             else
             {
-                await memoryStream.CopyToAsync(context.Response.Body);
+                await memoryStream.CopyToAsync(destination: context.Response.Body);
             }
         }
         finally

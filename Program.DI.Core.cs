@@ -1,5 +1,7 @@
+using IDC.DBDeployTools.Utilities.DI;
 using IDC.Utilities;
-using ScriptDeployerWeb.Utilities.DI;
+
+namespace IDC.DBDeployTools;
 
 /// <summary>
 /// Core program class containing dependency injection configurations
@@ -116,6 +118,6 @@ internal partial class Program
             defaultLanguage: _appConfigs.Get(path: "Language", defaultValue: "en")
         );
 
-        builder.Services.AddSingleton(_ => _language);
+        builder.Services.AddSingleton(implementationFactory: _ => _language);
     }
 }

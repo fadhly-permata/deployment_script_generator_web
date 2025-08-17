@@ -2,7 +2,7 @@ using IDC.Utilities.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ScriptDeployerWeb.Utilities.DI;
+namespace IDC.DBDeployTools.Utilities.DI;
 
 /// <summary>
 /// Handles appsettings.json configuration management with thread-safe operations.
@@ -21,7 +21,7 @@ namespace ScriptDeployerWeb.Utilities.DI;
 /// Configuration Structure:
 /// <code>
 /// {
-///   "AppName": "IDC.Template",
+///   "AppName": "IDC.DBDeployTools",
 ///   "Language": "en",
 ///   "Logging": {
 ///     "LogLevel": {
@@ -361,7 +361,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Expected Configuration Structure:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Environment": "Development",
     ///   "ConnectionStrings": {
     ///     "DefaultConnection": "mongodb://localhost:27017",
@@ -444,7 +444,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Expected JSON Structure:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Environment": "Production",
     ///   "Database": {
     ///     "ConnectionString": "mongodb://localhost:27017",
@@ -519,7 +519,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Configuration Structure Example:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Environment": "Development",
     ///   "Database": {
     ///     "ConnectionString": "mongodb://localhost:27017",
@@ -607,7 +607,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Example Configuration:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Server": {
     ///     "Port": 5000,
     ///     "Timeout": 30
@@ -703,7 +703,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Example Configuration:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Port": 5000,
     ///   "Features": {
     ///     "Logging": {
@@ -782,7 +782,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Example Configuration:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Logging": {
     ///     "LogLevel": {
     ///       "Default": "Information"
@@ -869,7 +869,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Example Configuration:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Logging": {
     ///     "LogLevel": {
     ///       "Default": "Information"
@@ -1029,7 +1029,7 @@ public sealed class AppSettingsHandler : IDisposable
     /// Example file content:
     /// <code>
     /// {
-    ///   "AppName": "IDC.Template",
+    ///   "AppName": "IDC.DBDeployTools",
     ///   "Language": "en",
     ///   "Logging": {
     ///     "LogLevel": {

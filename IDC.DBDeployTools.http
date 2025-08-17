@@ -1,0 +1,6 @@
+@IDC.DBDeployTools_HostAddress = http://localhost:22222
+
+GET {{IDC.DBDeployTools_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

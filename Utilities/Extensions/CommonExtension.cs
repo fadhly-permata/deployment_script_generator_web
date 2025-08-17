@@ -1,4 +1,4 @@
-namespace ScriptDeployerWeb.Utilities.Extensions;
+namespace IDC.DBDeployTools.Utilities.Extensions;
 
 internal static class CommonExtension
 {
@@ -63,7 +63,10 @@ internal static class CommonExtension
     internal static string UriBuilder(this string uri, string? path)
     {
         var builder = new UriBuilder(uri);
-        builder.Path = ($"{builder.Path}/{path}" ?? builder.Path).Replace("//", "/");
+        builder.Path = ($"{builder.Path}/{path}" ?? builder.Path).Replace(
+            oldValue: "//",
+            newValue: "/"
+        );
         return builder.ToString();
     }
 
@@ -71,8 +74,4 @@ internal static class CommonExtension
     {
         return string.IsNullOrEmpty(path) ? uri : new UriBuilder(uri) { Path = path }.ToString();
     }
-
-    internal static string AlphaOnly(this string str) => new([.. str.Where(char.IsLetter)]);
-
-    internal static string NumericOnly(this string str) => new([.. str.Where(char.IsDigit)]);
 }

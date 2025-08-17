@@ -1,5 +1,7 @@
+using IDC.DBDeployTools.Utilities.Middlewares;
 using Microsoft.Extensions.FileProviders;
-using ScriptDeployerWeb.Utilities.Middlewares;
+
+namespace IDC.DBDeployTools;
 
 internal partial class Program
 {
@@ -83,17 +85,22 @@ internal partial class Program
                 )
             );
 
+        // HTTP Method Filter - harus sebelum API Key Authentication dan routing
+        if (_appConfigs.Get(path: "Security.HttpMethodFilter.Enabled", defaultValue: true))
+            app.UseMiddleware<HttpMethodFilterMiddleware>();
+
         if (_appConfigs.Get(path: "Middlewares.ApiKeyAuthentication", defaultValue: true))
         {
             app.UseWhen(
                 predicate: context =>
                 {
                     var path = context.Request.Path.Value?.ToLower();
-                    return path?.StartsWith("/swagger") != true
-                        && path?.StartsWith("/css") != true
-                        && path?.StartsWith("/js") != true
-                        && path?.StartsWith("/themes") != true
-                        && path?.StartsWith("/images") != true;
+                    return path is not null
+                        && !path.StartsWith(value: "/swagger")
+                        && !path.StartsWith(value: "/css")
+                        && !path.StartsWith(value: "/js")
+                        && !path.StartsWith(value: "/themes")
+                        && !path.StartsWith(value: "/images");
                 },
                 configuration: appBuilder =>
                 {

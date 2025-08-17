@@ -1,6 +1,6 @@
 using IDC.Utilities;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Middleware for comprehensive HTTP request logging with performance metrics and error tracking.
@@ -120,11 +120,9 @@ public class RequestLoggingMiddleware(RequestDelegate next, SystemLogging system
 
         try
         {
-            await next(context);
-            var elapsed = DateTime.UtcNow - start;
-
+            await next(context: context);
             systemLogging.LogInformation(
-                $"{requestMethod} {requestPath} completed in {elapsed.TotalMilliseconds:F3}ms with status {context.Response.StatusCode}"
+                message: $"{requestMethod} {requestPath} completed in {(DateTime.UtcNow - start).TotalMilliseconds:F3}ms with status {context.Response.StatusCode}"
             );
         }
         catch (Exception ex)

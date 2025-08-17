@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace ScriptDeployerWeb.Utilities;
+namespace IDC.DBDeployTools.Utilities;
 
 /// <summary>
 /// Contains regex patterns for parsing log entries.

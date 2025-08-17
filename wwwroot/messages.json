@@ -7,8 +7,7 @@
         "error": "Error"
       },
       "nullMessages": {
-        "json_prop_not_found": "JSON property not found: {0}",
-        "reqbody_prop_not_found": "The '{0}' parameter is required on the request body."
+        "json_prop_not_found": "JSON property not found: {0}"
       },
       "message": {
         "processing_done": "API processing has been completed.",
@@ -47,12 +46,6 @@
         "data_not_deleted": "The data has not been deleted.",
         "query_preview": "The SQL query has been successfully previewed."
       }
-    },
-    "workflow": {
-      "last_process_not_found": "The last process could not be found.",
-      "process_already_finished": "Process has already finished.",
-      "the_next_process_cannot_be_found": "The next process cannot be found.",
-      "configuration_not_found": "Workflow configuration not found."
     },
     "security": {
       "api_key": {

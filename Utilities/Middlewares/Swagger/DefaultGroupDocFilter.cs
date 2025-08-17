@@ -1,7 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares.Swagger;
+namespace IDC.DBDeployTools.Utilities.Middlewares.Swagger;
 
 /// <summary>
 /// Filter to set default group for Swagger/OpenAPI endpoints that don't have any group specified.
@@ -195,16 +195,13 @@ public class DefaultGroupDocFilter : IDocumentFilter
             {
                 swaggerDoc.Paths.Add(key: path.Key, value: path.Value);
 
-                foreach (var operation in path.Value.Operations)
-                {
-                    if (!operation.Value.Tags.Any())
-                    {
-                        operation.Value.Tags =
-                        [
+                path.Value.Operations.Where(predicate: operation => !operation.Value.Tags.Any())
+                    .ToList()
+                    .ForEach(operation =>
+                        operation.Value.Tags = [
                             new OpenApiTag { Name = isDemoDoc ? "Demo" : "Main" },
-                        ];
-                    }
-                }
+                        ]
+                    );
             }
         }
 

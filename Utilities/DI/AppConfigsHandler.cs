@@ -2,7 +2,7 @@ using IDC.Utilities.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ScriptDeployerWeb.Utilities.DI;
+namespace IDC.DBDeployTools.Utilities.DI;
 
 /// <summary>
 /// Handles configuration management through JSON files with thread-safe operations.
@@ -197,7 +197,7 @@ public sealed class AppConfigsHandler : IDisposable
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/using-objects">Using Disposable Objects</seealso>
     private void ThrowIfDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(AppConfigsHandler));
+        ObjectDisposedException.ThrowIf(condition: _disposed, instance: nameof(AppConfigsHandler));
     }
 
     /// <summary>
@@ -344,8 +344,8 @@ public sealed class AppConfigsHandler : IDisposable
             path2: "wwwroot",
             path3: "appconfigs.jsonc"
         );
-        var jsonContent = File.ReadAllText(appConfigPath);
-        return new(JObject.Parse(jsonContent));
+        var jsonContent = File.ReadAllText(path: appConfigPath);
+        return new(JObject.Parse(json: jsonContent));
     }
 
     /// <summary>
@@ -391,7 +391,8 @@ public sealed class AppConfigsHandler : IDisposable
     /// <returns>A new instance of AppConfigsHandler initialized with the parsed configuration</returns>
     /// <exception cref="JsonReaderException">Thrown when the JSON string is invalid or cannot be parsed</exception>
     /// <seealso href="https://www.newtonsoft.com/json/help/html/ParsingLINQtoJSON.htm">Parsing JSON with LINQ to JSON</seealso>
-    public static AppConfigsHandler Load(string jsonContent) => new(JObject.Parse(jsonContent));
+    public static AppConfigsHandler Load(string jsonContent) =>
+        new(JObject.Parse(json: jsonContent));
 
     /// <summary>
     /// Loads configuration from an existing JObject.
@@ -574,7 +575,7 @@ public sealed class AppConfigsHandler : IDisposable
         ThrowIfDisposed();
         try
         {
-            _config.PropUpsert(path, value);
+            _config.PropUpsert(path: path, value: value);
             SaveToFile();
             return true;
         }
@@ -626,7 +627,7 @@ public sealed class AppConfigsHandler : IDisposable
         ThrowIfDisposed();
         try
         {
-            _config.PropUpdate(updates);
+            _config.PropUpdate(updates: updates);
             SaveToFile();
             return true;
         }
@@ -671,7 +672,7 @@ public sealed class AppConfigsHandler : IDisposable
         ThrowIfDisposed();
         try
         {
-            _config.PropRemove(kvp => kvp.Key == path);
+            _config.PropRemove(predicate: kvp => kvp.Key == path);
             SaveToFile();
             return true;
         }
@@ -707,13 +708,13 @@ public sealed class AppConfigsHandler : IDisposable
     /// <exception cref="IOException">Thrown when file writing fails due to I/O errors</exception>
     /// <exception cref="UnauthorizedAccessException">Thrown when the application lacks write permissions</exception>
     /// <seealso href="https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_Formatting.htm">Newtonsoft.Json.Formatting</seealso>
-    private void SaveToFile()
-    {
-        var appConfigPath = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "wwwroot",
-            "appconfigs.jsonc"
+    private void SaveToFile() =>
+        File.WriteAllText(
+            Path.Combine(
+                path1: Directory.GetCurrentDirectory(),
+                path2: "wwwroot",
+                path3: "appconfigs.jsonc"
+            ),
+            _config.ToString(Formatting.Indented)
         );
-        File.WriteAllText(appConfigPath, _config.ToString(Formatting.Indented));
-    }
 }

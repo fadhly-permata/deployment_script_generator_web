@@ -1,8 +1,10 @@
+using IDC.DBDeployTools.Utilities.Middlewares;
 using IDC.Utilities.Models.API;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using ScriptDeployerWeb.Utilities.Middlewares;
+
+namespace IDC.DBDeployTools;
 
 internal partial class Program
 {
@@ -59,7 +61,7 @@ internal partial class Program
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
         builder
-            .Services.AddControllers(options =>
+            .Services.AddControllers(configure: options =>
             {
                 const string ContentType = "application/json";
 
@@ -91,24 +93,71 @@ internal partial class Program
         // Add CORS policy
         if (_appConfigs.Get<bool>(path: "Security.Cors.Enabled"))
         {
-            builder.Services.AddCors(options =>
+            builder.Services.AddCors(setupAction: options =>
             {
                 options.AddPolicy(
                     name: "CorsPolicy",
-                    policy =>
+                    configurePolicy: policy =>
                     {
-                        policy
-                            .WithOrigins(
-                                _appConfigs.Get<string[]>(path: "Security.Cors.AllowedHosts")
-                                    ?? ["*"]
+                        var allowedHosts =
+                            _appConfigs.Get<string[]>(path: "Security.Cors.AllowedHosts") ?? [];
+
+                        // Allow any origin if any host pattern is a full wildcard
+                        if (
+                            allowedHosts.Any(predicate: host =>
+                                host.Trim() == "*"
+                                || host.Trim()
+                                    .Equals(
+                                        value: "http://*",
+                                        comparisonType: StringComparison.OrdinalIgnoreCase
+                                    )
+                                || host.Trim()
+                                    .Equals(
+                                        value: "https://*",
+                                        comparisonType: StringComparison.OrdinalIgnoreCase
+                                    )
                             )
+                        )
+                            policy.AllowAnyOrigin();
+                        else if (allowedHosts.Any(predicate: host => host.Contains(value: '*')))
+                            policy.WithOrigins(
+                                origins:
+                                [
+                                    .. allowedHosts.Where(predicate: host =>
+                                        !host.Contains(value: '*')
+                                        && Uri.TryCreate(
+                                            uriString: host,
+                                            uriKind: UriKind.Absolute,
+                                            result: out _
+                                        )
+                                    ),
+                                ]
+                            );
+                        else
+                            policy.WithOrigins(origins: allowedHosts);
+
+                        policy
                             .WithHeaders(
-                                _appConfigs.Get<string[]>(path: "Security.Cors.AllowedHeaders")
-                                    ?? ["*"]
+                                headers: _appConfigs.Get<string[]>(
+                                    path: "Security.Cors.AllowedHeaders"
+                                ) ?? ["*"]
                             )
                             .WithMethods(
-                                _appConfigs.Get<string[]>(path: "Security.Cors.AllowedMethods")
-                                    ?? ["*"]
+                                methods: _appConfigs.Get<string[]>(
+                                    path: "Security.Cors.AllowedMethods"
+                                )
+                                    ??
+                                    [
+                                        "GET",
+                                        "POST",
+                                        "PUT",
+                                        "DELETE",
+                                        "OPTIONS",
+                                        "HEAD",
+                                        "PATCH",
+                                        "TRACE",
+                                        "CONNECT",
+                                    ]
                             );
                     }
                 );

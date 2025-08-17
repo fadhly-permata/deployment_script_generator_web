@@ -1,4 +1,4 @@
-namespace ScriptDeployerWeb.Utilities;
+namespace IDC.DBDeployTools.Utilities;
 
 /// <summary>
 /// Provides common utility methods and functionality for the application,
@@ -155,22 +155,25 @@ public static class Commons
         int days = timeSpan.Days;
         int hours = timeSpan.Hours;
         int minutes = timeSpan.Minutes;
-        double seconds = Math.Round(timeSpan.Seconds + (timeSpan.Milliseconds / 1000.0), 2);
+        double seconds = Math.Round(
+            value: timeSpan.Seconds + (timeSpan.Milliseconds / 1000.0),
+            digits: 2
+        );
 
         var durationParts = new List<string>();
 
         if (days != 0)
-            durationParts.Add($"{days} days");
+            durationParts.Add(item: $"{days} days");
 
         if (hours != 0)
-            durationParts.Add($"{hours} hours");
+            durationParts.Add(item: $"{hours} hours");
 
         if (minutes != 0)
-            durationParts.Add($"{minutes} minutes");
+            durationParts.Add(item: $"{minutes} minutes");
 
-        if (seconds != 0)
+        if (Math.Abs(value: seconds) > 0.001)
             durationParts.Add($"{seconds} seconds");
 
-        return string.Join(" ", durationParts);
+        return string.Join(separator: " ", values: durationParts);
     }
 }

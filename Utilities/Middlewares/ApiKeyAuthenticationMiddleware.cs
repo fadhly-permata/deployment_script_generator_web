@@ -1,10 +1,10 @@
 using System.Net;
+using IDC.DBDeployTools.Utilities.DI;
 using IDC.Utilities;
 using IDC.Utilities.Models.API;
 using Newtonsoft.Json.Linq;
-using ScriptDeployerWeb.Utilities.DI;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Middleware for API key authentication.
@@ -180,7 +180,7 @@ public class ApiKeyAuthenticationMiddleware(AppConfigsHandler appConfigs, Langua
     {
         context.Response.StatusCode = (int)statusCode;
         await context.Response.WriteAsJsonAsync(
-            new APIResponse()
+            value: new APIResponse()
                 .ChangeStatus(language: _language, key: "api.status.failed")
                 .ChangeMessage(language: _language, key: $"security.api_key.{messageKey}")
         );
@@ -271,19 +271,19 @@ public class ApiKeyAuthenticationMiddleware(AppConfigsHandler appConfigs, Langua
     {
         // Skip authentication for static files
         if (
-            context.Request.Path.StartsWithSegments("/themes")
-            || context.Request.Path.StartsWithSegments("/images")
-            || context.Request.Path.StartsWithSegments("/js")
-            || context.Request.Path.StartsWithSegments("/css")
-            || context.Request.Path.StartsWithSegments("/openapi")
-            || context.Request.Path.StartsWithSegments("/logs")
+            context.Request.Path.StartsWithSegments(other: "/themes")
+            || context.Request.Path.StartsWithSegments(other: "/images")
+            || context.Request.Path.StartsWithSegments(other: "/js")
+            || context.Request.Path.StartsWithSegments(other: "/css")
+            || context.Request.Path.StartsWithSegments(other: "/openapi")
+            || context.Request.Path.StartsWithSegments(other: "/logs")
         )
         {
-            await next(context);
+            await next(context: context);
             return;
         }
 
-        if (!context.Request.Headers.TryGetValue(API_KEY_HEADER, out var apiKeyHeader))
+        if (!context.Request.Headers.TryGetValue(key: API_KEY_HEADER, value: out var apiKeyHeader))
         {
             await WriteErrorResponse(
                 context: context,
@@ -295,7 +295,8 @@ public class ApiKeyAuthenticationMiddleware(AppConfigsHandler appConfigs, Langua
 
         string apiKey = apiKeyHeader.ToString();
         var registeredKeys =
-            _appConfigs.Get<JArray>("Security.RegisteredApiKeyList")?.ToObject<string[]>() ?? [];
+            _appConfigs.Get<JArray>(path: "Security.RegisteredApiKeyList")?.ToObject<string[]>()
+            ?? [];
 
         if (registeredKeys.Length == 0)
         {
@@ -307,7 +308,7 @@ public class ApiKeyAuthenticationMiddleware(AppConfigsHandler appConfigs, Langua
             return;
         }
 
-        if (!registeredKeys.Contains(apiKey))
+        if (!registeredKeys.Contains(value: apiKey))
         {
             await WriteErrorResponse(
                 context: context,
@@ -317,6 +318,6 @@ public class ApiKeyAuthenticationMiddleware(AppConfigsHandler appConfigs, Langua
             return;
         }
 
-        await next(context);
+        await next(context: context);
     }
 }

@@ -1,10 +1,10 @@
+using IDC.DBDeployTools.Utilities;
+using IDC.DBDeployTools.Utilities.Models;
 using IDC.Utilities;
 using IDC.Utilities.Models.API;
 using Microsoft.AspNetCore.Mvc;
-using ScriptDeployerWeb.Utilities;
-using ScriptDeployerWeb.Utilities.Models;
 
-namespace ScriptDeployerWeb.Controllers;
+namespace IDC.DBDeployTools.Controllers;
 
 /// <summary>
 /// Controller for managing API key operations and generation
@@ -32,7 +32,10 @@ namespace ScriptDeployerWeb.Controllers;
 [ApiExplorerSettings(GroupName = "Demo")]
 public class DemoApiKeys(Language language, SystemLogging systemLogging) : ControllerBase
 {
-    private static string GetSalt() => System.IO.File.ReadAllText("wwwroot/security/enc_salt.txt");
+    private const string CON_API_STATUS_FAILED = "api.status.failed";
+
+    private static string GetSalt() =>
+        System.IO.File.ReadAllText(path: "wwwroot/security/enc_salt.txt");
 
     /// <summary>
     /// Generates a user-specific API key
@@ -45,7 +48,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         try
         {
             return new APIResponseData<string>().ChangeData(
-                ApiKeyGenerator.Generate(
+                data: ApiKeyGenerator.Generate(
                     userId: request.UserId,
                     appId: request.AppId,
                     expiryDate: request.ExpiryDate,
@@ -56,7 +59,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         catch (Exception ex)
         {
             return new APIResponseData<string>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,
@@ -78,7 +81,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         try
         {
             return new APIResponseData<string>().ChangeData(
-                ApiKeyGenerator.GenerateTemporary(
+                data: ApiKeyGenerator.GenerateTemporary(
                     validity: request.Validity,
                     purpose: request.Purpose,
                     salt: GetSalt()
@@ -88,7 +91,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         catch (Exception ex)
         {
             return new APIResponseData<string>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,
@@ -108,7 +111,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         try
         {
             return new APIResponseData<string>().ChangeData(
-                ApiKeyGenerator.GenerateForClient(
+                data: ApiKeyGenerator.GenerateForClient(
                     clientId: request.ClientId,
                     clientSecret: request.ClientSecret,
                     permissions: request.Permissions,
@@ -119,7 +122,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         catch (Exception ex)
         {
             return new APIResponseData<string>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,
@@ -141,7 +144,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         try
         {
             return new APIResponseData<string>().ChangeData(
-                ApiKeyGenerator.GenerateForEnvironment(
+                data: ApiKeyGenerator.GenerateForEnvironment(
                     environment: request.Environment,
                     serviceName: request.ServiceName,
                     version: request.Version,
@@ -152,7 +155,7 @@ public class DemoApiKeys(Language language, SystemLogging systemLogging) : Contr
         catch (Exception ex)
         {
             return new APIResponseData<string>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace ScriptDeployerWeb.Utilities;
+namespace IDC.DBDeployTools.Utilities;
 
 /// <summary>
 /// Provides a collection of generated regular expression patterns for common validation scenarios.

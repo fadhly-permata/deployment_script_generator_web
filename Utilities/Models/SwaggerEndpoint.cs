@@ -1,4 +1,4 @@
-namespace ScriptDeployerWeb.Utilities.Models;
+namespace IDC.DBDeployTools.Utilities.Models;
 
 /// <summary>
 /// Represents a Swagger/OpenAPI endpoint configuration

@@ -1,7 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares.Swagger;
+namespace IDC.DBDeployTools.Utilities.Middlewares.Swagger;
 
 /// <summary>
 /// Filter to sort Swagger/OpenAPI endpoints alphabetically.
@@ -160,11 +160,11 @@ public class DocumentSortDocFilter : IDocumentFilter
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
         var paths = swaggerDoc
-            .Paths.OrderBy(static x => x.Key)
-            .ToDictionary(static x => x.Key, static x => x.Value);
+            .Paths.OrderBy(keySelector: static x => x.Key)
+            .ToDictionary(keySelector: static x => x.Key, elementSelector: static x => x.Value);
 
         swaggerDoc.Paths.Clear();
         foreach (var path in paths)
-            swaggerDoc.Paths.Add(path.Key, path.Value);
+            swaggerDoc.Paths.Add(key: path.Key, value: path.Value);
     }
 }

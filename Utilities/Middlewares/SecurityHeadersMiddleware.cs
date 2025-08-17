@@ -1,4 +1,4 @@
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Middleware for adding security headers to HTTP responses.
@@ -198,11 +198,11 @@ public class SecurityHeadersMiddleware(
     /// <seealso href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/">ASP.NET Core Middleware</seealso>
     public async Task InvokeAsync(HttpContext context)
     {
-        if (ShouldApplyHeaders(context))
+        if (ShouldApplyHeaders(context: context))
             foreach (var option in _options)
                 context.Response.Headers[option.Key] = option.Value;
 
-        await _next(context);
+        await _next(context: context);
     }
 
     /// <summary>
@@ -267,6 +267,6 @@ public class SecurityHeadersMiddleware(
     /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.pathstring.startswithsegments">PathString.StartsWithSegments Method</seealso>
     /// <seealso href="https://owasp.org/www-project-secure-headers/">OWASP Secure Headers Project</seealso>
     private bool ShouldApplyHeaders(HttpContext context) =>
-        (_enableForAllEndpoints || context.Request.Path.StartsWithSegments("/api"))
+        (_enableForAllEndpoints || context.Request.Path.StartsWithSegments(other: "/api"))
         && (context.Request.IsHttps ? _enableForHttps : _enableForHttp);
 }

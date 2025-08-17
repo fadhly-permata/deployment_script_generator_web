@@ -3,7 +3,7 @@ using IDC.Utilities.Models.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ScriptDeployerWeb.Utilities.Middlewares;
+namespace IDC.DBDeployTools.Utilities.Middlewares;
 
 /// <summary>
 /// Filter that handles exceptions and returns appropriate error responses based on the exception type.
@@ -200,15 +200,21 @@ public class ExceptionHandlerFilter(Language language, SystemLogging systemLoggi
 
         context.Result = context.Exception switch
         {
-            BadHttpRequestException => new BadRequestObjectResult(response),
-            UnauthorizedAccessException => new UnauthorizedObjectResult(response),
-            KeyNotFoundException => new NotFoundObjectResult(response),
-            InvalidOperationException => new BadRequestObjectResult(response),
-            ArgumentException => new BadRequestObjectResult(response),
-            NotImplementedException => new StatusCodeResult(StatusCodes.Status501NotImplemented),
-            TimeoutException => new StatusCodeResult(StatusCodes.Status408RequestTimeout),
-            OperationCanceledException => new StatusCodeResult(StatusCodes.Status409Conflict),
-            _ => new ObjectResult(response)
+            BadHttpRequestException => new BadRequestObjectResult(error: response),
+            UnauthorizedAccessException => new UnauthorizedObjectResult(value: response),
+            KeyNotFoundException => new NotFoundObjectResult(value: response),
+            InvalidOperationException => new BadRequestObjectResult(error: response),
+            ArgumentException => new BadRequestObjectResult(error: response),
+            NotImplementedException => new StatusCodeResult(
+                statusCode: StatusCodes.Status501NotImplemented
+            ),
+            TimeoutException => new StatusCodeResult(
+                statusCode: StatusCodes.Status408RequestTimeout
+            ),
+            OperationCanceledException => new StatusCodeResult(
+                statusCode: StatusCodes.Status409Conflict
+            ),
+            _ => new ObjectResult(value: response)
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
             },

@@ -1,6 +1,6 @@
 using IDC.Utilities;
 
-namespace ScriptDeployerWeb.Utilities.Extensions;
+namespace IDC.DBDeployTools.Utilities.Extensions;
 
 internal static class ExceptionExtension
 {
@@ -11,14 +11,8 @@ internal static class ExceptionExtension
     )
     {
         // Log the exception using the system logging service
-        systemLogging.LogError(exception: exception);
+        systemLogging.LogError(message: $"Additional logging for exception: {exception.Message}");
 
         // TODO: Implement any additional logging actions here
-    }
-
-    public static int? GetErrLine(this Exception ex)
-    {
-        var st = new System.Diagnostics.StackTrace(e: ex, fNeedFileInfo: true);
-        return st.GetFrame(index: st.FrameCount - 1)?.GetFileLineNumber();
     }
 }

@@ -1,4 +1,4 @@
-namespace ScriptDeployerWeb.Utilities.Helpers;
+namespace IDC.DBDeployTools.Utilities.Helpers;
 
 /// <summary>
 /// Provides utility methods for system logging operations and file management. Supports both Windows and Linux systems.
@@ -330,11 +330,11 @@ public static class SystemLoggingLogic
     public static string FormatFileSize(long length) =>
         length switch
         {
-            < 1024 => $"{length} B",
-            < 1024 * 1024 => $"{length / 1024.0:N2} KB",
-            < 1024 * 1024 * 1024 => $"{length / (1024.0 * 1024):N2} MB",
-            < 1024L * 1024 * 1024 * 1024 => $"{length / (1024.0 * 1024 * 1024):N2} GB",
-            _ => $"{length / (1024.0 * 1024 * 1024 * 1024):N2} TB",
+            < 0x400 => $"{length} B",
+            < 0x400 * 0x400 => $"{length / 1024.0:N2} KB",
+            < 0x400 * 0x400 * 0x400 => $"{length / (1024.0 * 0x400):N2} MB",
+            < 1024L * 0x400 * 0x400 * 0x400 => $"{length / (1024.0 * 0x400 * 0x400):N2} GB",
+            _ => $"{length / (1024.0 * 0x400 * 0x400 * 0x400):N2} TB",
         };
 
     /// <summary>
@@ -726,10 +726,13 @@ public static class SystemLoggingLogic
                 {
                     entry = new
                     {
-                        Timestamp = DateTime.Parse(simpleMatch.Groups[1].Value),
-                        Level = simpleMatch.Groups[2].Value,
+                        Timestamp = DateTime.Parse(
+                            s: simpleMatch.Groups[0b1].Value,
+                            provider: System.Globalization.CultureInfo.InvariantCulture
+                        ),
+                        Level = simpleMatch.Groups[0b10].Value,
                         Type = string.Empty,
-                        Message = simpleMatch.Groups[3].Value.Trim(),
+                        Message = simpleMatch.Groups[0b11].Value.Trim(),
                     };
                     return true;
                 }
@@ -741,7 +744,7 @@ public static class SystemLoggingLogic
                 if (detailedMatch.Success)
                 {
                     var stackTrace = detailedMatch
-                        .Groups[5]
+                        .Groups[0b101]
                         .Value.Split(
                             separator: "\n   --> ",
                             options: StringSplitOptions.RemoveEmptyEntries
@@ -754,10 +757,13 @@ public static class SystemLoggingLogic
 
                     entry = new
                     {
-                        Timestamp = DateTime.Parse(s: detailedMatch.Groups[1].Value),
-                        Level = detailedMatch.Groups[2].Value,
-                        Type = detailedMatch.Groups[3].Value,
-                        Message = detailedMatch.Groups[4].Value,
+                        Timestamp = DateTime.Parse(
+                            s: detailedMatch.Groups[0b1].Value,
+                            provider: System.Globalization.CultureInfo.InvariantCulture
+                        ),
+                        Level = detailedMatch.Groups[0b10].Value,
+                        Type = detailedMatch.Groups[0b11].Value,
+                        Message = detailedMatch.Groups[0b100].Value,
                         StackTrace = stackTrace,
                     };
                     return true;

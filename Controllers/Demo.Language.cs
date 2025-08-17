@@ -1,9 +1,9 @@
+using IDC.DBDeployTools.Utilities;
 using IDC.Utilities;
 using IDC.Utilities.Models.API;
 using Microsoft.AspNetCore.Mvc;
-using ScriptDeployerWeb.Utilities;
 
-namespace ScriptDeployerWeb.Controllers;
+namespace IDC.DBDeployTools.Controllers;
 
 /// <summary>
 /// Controller for managing language-related operations
@@ -24,6 +24,8 @@ namespace ScriptDeployerWeb.Controllers;
 [ApiExplorerSettings(GroupName = "Demo")]
 public partial class DemoLanguage(Language language, SystemLogging systemLogging) : ControllerBase
 {
+    private const string CON_API_STATUS_FAILED = "api.status.failed";
+
     /// <summary>
     /// Gets all available languages
     /// </summary>
@@ -33,12 +35,14 @@ public partial class DemoLanguage(Language language, SystemLogging systemLogging
     {
         try
         {
-            return new APIResponseData<string[]>().ChangeData(language.GetAvailableLanguages());
+            return new APIResponseData<string[]>().ChangeData(
+                data: language.GetAvailableLanguages()
+            );
         }
         catch (Exception ex)
         {
             return new APIResponseData<string[]>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,
@@ -62,13 +66,13 @@ public partial class DemoLanguage(Language language, SystemLogging systemLogging
         try
         {
             return new APIResponseData<string>().ChangeData(
-                language.GetMessage(path: path, language: lang)
+                data: language.GetMessage(path: path, language: lang)
             );
         }
         catch (Exception ex)
         {
             return new APIResponseData<string>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,
@@ -93,13 +97,13 @@ public partial class DemoLanguage(Language language, SystemLogging systemLogging
         try
         {
             return new APIResponseData<bool>().ChangeData(
-                language.UpdateMessage(language: lang, path: path, value: value)
+                data: language.UpdateMessage(language: lang, path: path, value: value)
             );
         }
         catch (Exception ex)
         {
             return new APIResponseData<bool>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,
@@ -116,12 +120,12 @@ public partial class DemoLanguage(Language language, SystemLogging systemLogging
     {
         try
         {
-            return new APIResponseData<bool>().ChangeData(language.Reload());
+            return new APIResponseData<bool>().ChangeData(data: language.Reload());
         }
         catch (Exception ex)
         {
             return new APIResponseData<bool>()
-                .ChangeStatus(language: language, key: "api.status.failed")
+                .ChangeStatus(language: language, key: CON_API_STATUS_FAILED)
                 .ChangeMessage(
                     exception: ex,
                     logging: systemLogging,

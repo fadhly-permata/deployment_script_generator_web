@@ -1,6 +1,8 @@
+using IDC.DBDeployTools.Utilities.Middlewares;
 using IDC.Utilities;
 using IDC.Utilities.Comm.Http;
-using ScriptDeployerWeb.Utilities.Middlewares;
+
+namespace IDC.DBDeployTools;
 
 internal partial class Program
 {

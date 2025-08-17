@@ -1,12 +1,16 @@
 using System.Reflection;
+using IDC.DBDeployTools.Utilities.DI;
+using IDC.DBDeployTools.Utilities.Middlewares.Swagger;
+using IDC.DBDeployTools.Utilities.Models;
 using Microsoft.OpenApi.Models;
-using ScriptDeployerWeb.Utilities.DI;
-using ScriptDeployerWeb.Utilities.Middlewares.Swagger;
-using ScriptDeployerWeb.Utilities.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
+
+namespace IDC.DBDeployTools;
 
 internal partial class Program
 {
+    private const string CON_STR_APP_NAME = "AppName";
+
     /// <summary>
     /// Configures Swagger/OpenAPI documentation generation for the application
     /// </summary>
@@ -84,7 +88,7 @@ internal partial class Program
     /// <seealso href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore">Swashbuckle Documentation</seealso>
     private static void ConfigureSwagger(WebApplicationBuilder builder)
     {
-        if (_appConfigs.Get<bool>(path: "SwaggerConfig.UI.Enable") == false)
+        if (!_appConfigs.Get<bool>(path: "SwaggerConfig.UI.Enable"))
             return;
 
         builder.Services.AddEndpointsApiExplorer();
@@ -124,12 +128,12 @@ internal partial class Program
             // Tambahkan resolver untuk menangani konflik action
             options.ResolveConflictingActions(apiDescriptions =>
             {
-                // Prioritaskan controller dari namespace IDC.Template
+                // Prioritaskan controller dari namespace IDC.DBDeployTools
                 return apiDescriptions.FirstOrDefault(api =>
                         api.ActionDescriptor.DisplayName?.Contains(
                             value: _appConfigs.Get<string>(
-                                path: "AppName",
-                                defaultValue: "IDC.Template"
+                                path: CON_STR_APP_NAME,
+                                defaultValue: "IDC.DBDeployTools"
                             )
                         ) == true
                     ) ?? apiDescriptions.First();
@@ -211,9 +215,9 @@ internal partial class Program
                     return true;
                 }
             );
-
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
             options.IncludeXmlComments(xmlPath);
 
             options.DocumentFilter<DefaultGroupDocFilter>();
@@ -291,18 +295,18 @@ internal partial class Program
             return;
 
         app.UseSwagger();
-        app.UseSwaggerUI(options =>
+        app.UseSwaggerUI(setupAction: options =>
         {
             // Main endpoints
-            ConfigureMainEndpoint(options, _appConfigs);
+            ConfigureMainEndpoint(options: options, appConfigs: _appConfigs);
 
             // Demo endpoints
-            ConfigureDemoEndpoint(options);
+            ConfigureDemoEndpoint(options: options);
 
             // Additional endpoints from SwaggerList
-            ConfigureAdditionalEndpoints(options, app, _appConfigs);
+            ConfigureAdditionalEndpoints(options: options, app: app, appConfigs: _appConfigs);
 
-            ConfigureSwaggerUIStyle(options);
+            ConfigureSwaggerUIStyle(options: options);
         });
     }
 
@@ -363,7 +367,7 @@ internal partial class Program
     {
         options.SwaggerEndpoint(
             url: "/swagger/Main/swagger.json",
-            name: appConfigs.Get(path: "AppName", defaultValue: "IDC Template API")
+            name: appConfigs.Get(path: CON_STR_APP_NAME, defaultValue: "IDC.DBDeployTools API")
         );
     }
 
@@ -380,7 +384,7 @@ internal partial class Program
     ///
     /// The demo endpoint:
     /// - Uses a fixed URL path "/swagger/Demo/swagger.json"
-    /// - Has a predefined name "IDC Template Demo API"
+    /// - Has a predefined name "IDC.DBDeployTools Demo API"
     /// - Is automatically filtered in the UI to only show demo-related endpoints
     ///
     /// Example usage:
@@ -409,7 +413,7 @@ internal partial class Program
     /// </seealso>
     private static void ConfigureDemoEndpoint(SwaggerUIOptions options)
     {
-        options.SwaggerEndpoint(url: "/swagger/Demo/swagger.json", name: "IDC Template Demo API");
+        options.SwaggerEndpoint(url: "/swagger/Demo/swagger.json", name: "IDC.DBDeployTools Demo API");
     }
 
     /// <summary>
@@ -474,21 +478,18 @@ internal partial class Program
     )
     {
         var swaggerList = app
-            .Configuration.GetSection("SwaggerList")
+            .Configuration.GetSection(key: "SwaggerList")
             .Get<List<SwaggerEndpoint>>()
-            ?.Where(endpoint =>
-                endpoint.Name != appConfigs.Get(path: "AppName", defaultValue: "IDC Template API")
-                && endpoint.Name != "IDC Template Demo API"
+            ?.Where(predicate: endpoint =>
+                endpoint.Name
+                    != appConfigs.Get(path: CON_STR_APP_NAME, defaultValue: "IDC.DBDeployTools API")
+                && endpoint.Name != "IDC.DBDeployTools Demo API"
             )
-            .OrderBy(endpoint => endpoint.Name);
+            .OrderBy(keySelector: endpoint => endpoint.Name);
 
         if (swaggerList != null)
-        {
             foreach (var endpoint in swaggerList)
-            {
                 options.SwaggerEndpoint(url: endpoint.URL, name: endpoint.Name);
-            }
-        }
     }
 
     /// <summary>
@@ -538,22 +539,22 @@ internal partial class Program
     private static void ConfigureSwaggerUIStyle(SwaggerUIOptions options)
     {
         options.DocumentTitle =
-            $"[SUI] {_appConfigs.Get(path: "AppName", defaultValue: "IDC Template API")}";
+            $"[SUI] {_appConfigs.Get(path: CON_STR_APP_NAME, defaultValue: "IDC.DBDeployTools API")}";
 
         options.InjectStylesheet(
-            _appConfigs.Get(
+            path: _appConfigs.Get(
                 path: "SwaggerConfig.UI.Theme",
                 defaultValue: "/themes/theme-monokai-dark.css"
             )!
         );
-        options.InjectStylesheet("/_content/IDC.Template/css/swagger-custom.css");
+        options.InjectStylesheet(path: "/_content/IDC.DBDeployTools/css/swagger-custom.css");
 
         options.HeadContent =
             @"
                 <link rel='stylesheet' type='text/css' href='/css/swagger-custom.css' />
             ";
 
-        options.InjectJavascript("/js/swagger-theme-switcher.js");
+        options.InjectJavascript(path: "/js/swagger-theme-switcher.js");
     }
 
     /// <summary>
@@ -579,15 +580,10 @@ internal partial class Program
     /// </code>
     /// </example>
     /// </remarks>
-    private static bool ExcludeAPIPath(string path)
-    {
-        var excludedPaths = _appConfigs.Get<List<string>>(
-            path: "SwaggerConfig.ExcludedPaths",
-            defaultValue: []
-        );
-
-        return excludedPaths?.Any(excluded =>
-                path.StartsWith(excluded, StringComparison.OrdinalIgnoreCase)
+    private static bool ExcludeAPIPath(string path) =>
+        _appConfigs
+            .Get<List<string>>(path: "SwaggerConfig.ExcludedPaths", defaultValue: [])
+            ?.Any(predicate: excluded =>
+                path.StartsWith(value: excluded, comparisonType: StringComparison.OrdinalIgnoreCase)
             ) ?? false;
-    }
 }

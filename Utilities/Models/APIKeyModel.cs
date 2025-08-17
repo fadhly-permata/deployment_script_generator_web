@@ -1,4 +1,4 @@
-namespace ScriptDeployerWeb.Utilities.Models;
+namespace IDC.DBDeployTools.Utilities.Models;
 
 /// <summary>
 /// Represents a request model for generating a user-specific API key.

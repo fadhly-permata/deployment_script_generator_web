@@ -1,6 +1,6 @@
 {
     // Nama applikasi, digunakan untuk menampilkan nama applikasi di Swagger UI
-    "AppName": "ScriptDeployerWeb",
+    "AppName": "IDC.DBDeployTools",
     // Bahasa yang digunakan untuk menampilkan pesan. Opsi: en, id
     "Language": "en",
     // Pengaturan logging
@@ -9,7 +9,7 @@
         "LogLevel": {
             // Level logging default, opsi: Information, Warning, Error
             "Default": "Information",
-            // Level logging untuk Microsoft.AspNetCore, opsi: Information, Warning, Error
+            // Level logging untuk Microsoft.AspNetCore, opsi: Information, Warning, Error, Trace, Debug
             "Microsoft.AspNetCore": "Warning"
         },
         // Pasangkan logging ke objek DI 
@@ -39,11 +39,11 @@
             "ExpirationInMinutes": 5
         },
         // Aktifkan SQLite
-        "SQLite": false,
+        "SQLite": true,
         // Aktifkan MongoDB
         "MongoDB": false,
         // Aktifkan PostgreSQL
-        "PGSQL": true
+        "PGSQL": false
     },
     // Pengaturan Middlewares
     "Middlewares": {
@@ -87,6 +87,9 @@
         "Cors": {
             // Aktifkan CORS
             "Enabled": true,
+            "HttpMethodFilter": {
+                "Enabled": true
+            },
             // Host yang diizinkan untuk mengakses API
             "AllowedHosts": [
                 "http://*",
@@ -94,7 +97,7 @@
                 "http://localhost:*"
             ],
             // Header yang diizinkan untuk dikirim ke API. 
-            // Opsi: Authorization, Content-Type, Accept, Origin, X-Requested-With
+            // Opsi: Authorization, Content-Type, Accept, Origin, X-Requested-With, DLL
             "AllowedHeaders": [
                 "X-API-Key",
                 "Authorization",
@@ -103,10 +106,17 @@
                 "Origin",
                 "X-Requested-With"
             ],
-            // Metode HTTP yang diizinkan untuk mengakses API. Opsi: GET, POST, PUT, DELETE, OPTIONS
+            // Metode HTTP yang diizinkan untuk mengakses API. Opsi: GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH, DLL
             "AllowedMethods": [
                 "GET",
-                "POST"
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS",
+                "HEAD",
+                "PATCH",
+                "TRACE",
+                "CONNECT",
             ]
         },
         // Daftar API key yang terdaftar
@@ -129,11 +139,11 @@
         // Pengaturan OpenAPI
         "OpenApiInfo": {
             // Informasi OpenAPI
-            "Title": "API - Workflow Runner",
+            "Title": "API - IDC.DBDeployTools",
             // Versi OpenAPI
-            "Version": "v1",
+            "Version": "v2",
             // Deskripsi OpenAPI
-            "Description": "API documentation for Workflow Runner",
+            "Description": "API documentation for Backend Template",
             // Syarat dan ketentuan OpenAPI
             "TermsOfService": "/openapi/terms.html",
             // Kontak OpenAPI

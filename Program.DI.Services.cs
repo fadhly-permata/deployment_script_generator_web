@@ -1,8 +1,9 @@
 using IDC.Utilities;
 using IDC.Utilities.Data;
-using IDC.Utilities.Extensions;
 using IDC.Utilities.Models.Data;
 using MongoDB.Driver;
+
+namespace IDC.DBDeployTools;
 
 internal partial class Program
 {
@@ -34,11 +35,11 @@ internal partial class Program
     /// <seealso cref="SystemLogging"/>
     /// <seealso href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/">Logging in .NET Core</seealso>
     private static void ConfigureSystemLogging(WebApplicationBuilder builder) =>
-        builder.Services.AddSingleton(_ =>
+        builder.Services.AddSingleton(implementationFactory: _ =>
         {
             return new SystemLogging(
                 logDirectory: _appConfigs.Get(path: "Logging.LogDirectory", defaultValue: "logs"),
-                source: _appConfigs.Get(path: "AppName", defaultValue: "IDC.Template"),
+                source: _appConfigs.Get(path: "AppName", defaultValue: "IDC.DBDeployTools"),
                 enableOsLogging: _appConfigs.Get(path: "Logging.OSLogging", defaultValue: true),
                 enableFileLogging: _appConfigs.Get(path: "Logging.FileLogging", defaultValue: true),
                 autoCleanupOldLogs: _appConfigs.Get(
@@ -92,32 +93,22 @@ internal partial class Program
     private static void ConfigurePGSQL(WebApplicationBuilder builder)
     {
         if (_appConfigs.Get(path: "DependencyInjection.PGSQL", defaultValue: false))
-            builder.Services.AddScoped(static _ =>
+            builder.Services.AddScoped(implementationFactory: static _ =>
             {
-                string pass = _appSettings.Get(
-                    path: "configPass.passwordDB",
-                    defaultValue: string.Empty
+                string defaultConString = _appSettings.Get(
+                    path: "DefaultConStrings.IDCTemplate.PGSQL",
+                    defaultValue: "ConnectionString_en"
                 );
-                string key = _appSettings.Get(
-                    path: "KeyConvert.EncryptionKey",
-                    defaultValue: string.Empty
-                );
-
-                if (pass != string.Empty && key != string.Empty)
-                    pass = pass.LegacyDecryptor(key);
-
-                var connString = new CommonConnectionString()
-                    .FromConnectionString(
-                        connectionString: _appSettings.Get(
-                            path: $"DbContextSettings.{(_appSettings.Get(path: "DefaultConStrings.WFRunner.PGSQL", defaultValue: "ConnectionString_en"))}",
-                            defaultValue: "Host=localhost;Port=5432;Database=mydb;Username=myuser;Password=mypassword"
-                        )
-                    )
-                    .ChangePassword(newPassword: pass)
-                    .ToPostgreSQL();
 
                 return new PostgreHelper(
-                    connectionString: connString,
+                    connectionString: new CommonConnectionString()
+                        .FromConnectionString(
+                            connectionString: _appSettings.Get(
+                                path: $"DbContextSettings.{defaultConString}",
+                                defaultValue: "Host=localhost;Port=5432;Database=mydb;Username=myuser;Password=mypassword"
+                            )
+                        )
+                        .ToPostgreSQL(),
                     logging: _appConfigs.Get(path: "Logging.AttachToDIObjects", defaultValue: true)
                         ? (SystemLogging?)_systemLogging
                         : null
@@ -156,22 +147,19 @@ internal partial class Program
     private static void ConfigureSQLite(WebApplicationBuilder builder)
     {
         if (_appConfigs.Get(path: "DependencyInjection.SQLite", defaultValue: false))
-            builder.Services.AddScoped(static _ =>
+            builder.Services.AddScoped(implementationFactory: static _ =>
             {
                 string defaultConString = _appSettings.Get(
-                    path: "DefaultConStrings.WFRunner.SQLite",
+                    path: "DefaultConStrings.IDCTemplate.SQLite",
                     defaultValue: "memory"
                 );
 
+                var logging = _appConfigs.Get(path: "Logging.AttachToDIObjects", defaultValue: true)
+                    ? (SystemLogging?)_systemLogging
+                    : null;
+
                 return defaultConString == "memory"
-                    ? new SQLiteHelper(
-                        logging: _appConfigs.Get(
-                            path: "Logging.AttachToDIObjects",
-                            defaultValue: true
-                        )
-                            ? (SystemLogging?)_systemLogging
-                            : null
-                    )
+                    ? new SQLiteHelper(logging: logging)
                     : new SQLiteHelper(
                         connectionString: new CommonConnectionString()
                             .FromConnectionString(
@@ -181,12 +169,7 @@ internal partial class Program
                                 )
                             )
                             .ToSQLite(),
-                        logging: _appConfigs.Get(
-                            path: "Logging.AttachToDIObjects",
-                            defaultValue: true
-                        )
-                            ? (SystemLogging?)_systemLogging
-                            : null
+                        logging: logging
                     );
             });
     }
@@ -225,7 +208,7 @@ internal partial class Program
             builder.Services.AddScoped(static _ =>
             {
                 string defaultConString = _appSettings.Get(
-                    path: "DefaultConStrings.WFRunner.MongoDB",
+                    path: "DefaultConStrings.IDCTemplate.MongoDB",
                     defaultValue: "local"
                 );
 
@@ -235,11 +218,10 @@ internal partial class Program
                         defaultValue: "mongodb://localhost:27017"
                     )
                 );
-                settings.ServerSelectionTimeout = TimeSpan.FromSeconds(5);
-                settings.ConnectTimeout = TimeSpan.FromSeconds(5);
-                settings.SocketTimeout = TimeSpan.FromSeconds(5);
+                settings.ServerSelectionTimeout = TimeSpan.FromSeconds(value: 0b101);
+                settings.ConnectTimeout = TimeSpan.FromSeconds(value: 0b101);
+                settings.SocketTimeout = TimeSpan.FromSeconds(value: 0b101);
                 settings.RetryWrites = false;
-                // settings.DirectConnection = true;
                 settings.DirectConnection = defaultConString != "withReplica";
 
                 return new MongoClient(settings).GetDatabase(settings.ApplicationName ?? "IDC_EN");
